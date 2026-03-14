@@ -32,6 +32,9 @@ export const getAllBlogs = async (req: Request, res: Response) => {
 
 export const getBlogById = async (req: Request, res: Response) => {
   const { id } = req.params;
+  if (!id || typeof id !== 'string') {
+    return res.status(400).json({ message: 'Invalid blog ID' });
+  }
   try {
     const blog = await prisma.blog.findUnique({
       where: { id },
@@ -47,9 +50,12 @@ export const getBlogById = async (req: Request, res: Response) => {
 export const updateBlog = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
   const { title, content } = req.body;
+  if (!id || typeof id !== 'string') {
+    return res.status(400).json({ message: 'Invalid blog ID' });
+  }
   try {
     const blog = await prisma.blog.update({
-      where: { id, authorId: req.userId },
+      where: { id, authorId: req.userId! },
       data: { title, content },
     });
     res.json(blog);
@@ -60,9 +66,12 @@ export const updateBlog = async (req: AuthRequest, res: Response) => {
 
 export const deleteBlog = async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
+  if (!id || typeof id !== 'string') {
+    return res.status(400).json({ message: 'Invalid blog ID' });
+  }
   try {
     await prisma.blog.delete({
-      where: { id, authorId: req.userId },
+      where: { id, authorId: req.userId! },
     });
     res.json({ message: 'Blog deleted' });
   } catch (error) {
